@@ -17,6 +17,7 @@ class FirebaseNotificationService extends NotificationService {
   final Color? notificationColor;
   final String? channelDescription;
   final void Function(String? vapidKey)? getToken;
+  final String defaultIcon;
 
   FirebaseNotificationService(
       this._firebaseMessaging, this._flutterLocalNotificationsPlugin,
@@ -25,6 +26,7 @@ class FirebaseNotificationService extends NotificationService {
       this.channelName,
       this.notificationColor,
       this.channelDescription,
+      required this.defaultIcon,
       this.getToken});
 
   @override
@@ -46,8 +48,8 @@ class FirebaseNotificationService extends NotificationService {
   }
 
   Future<void> _configureLocalNotifications() async {
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@drawable/ic_stat_notification');
+    AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings(defaultIcon);
     final DarwinInitializationSettings iosSettings =
         DarwinInitializationSettings();
     final InitializationSettings initSettings = InitializationSettings(
