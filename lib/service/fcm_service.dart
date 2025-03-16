@@ -16,8 +16,9 @@ class FirebaseNotificationService extends NotificationService {
   final String? channelName;
   final Color? notificationColor;
   final String? channelDescription;
-  final void Function(String? vapidKey)? getToken;
+  final Function(String? vapidKey)? getToken;
   final String defaultIcon;
+  final bool showToken;
 
   FirebaseNotificationService(
       this._firebaseMessaging, this._flutterLocalNotificationsPlugin,
@@ -27,6 +28,7 @@ class FirebaseNotificationService extends NotificationService {
       this.notificationColor,
       this.channelDescription,
       required this.defaultIcon,
+      this.showToken = false,
       this.getToken});
 
   @override
@@ -61,8 +63,10 @@ class FirebaseNotificationService extends NotificationService {
   }
 
   Future<void> _setupFirebaseListeners() async {
-    final token = await _firebaseMessaging.getToken();
-    if (getToken != null) getToken!(token);
+    if (showToken) {
+      final token = await _firebaseMessaging.getToken();
+      getToken!(token);
+    }
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       _showLocalNotification(message);
