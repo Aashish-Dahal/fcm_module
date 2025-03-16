@@ -61,8 +61,8 @@ class FirebaseNotificationService extends NotificationService {
   }
 
   Future<void> _setupFirebaseListeners() async {
-    String? token = await _firebaseMessaging.getToken();
-    if (token != null) getToken!(token);
+    final token = await _firebaseMessaging.getToken();
+    if (getToken != null) getToken!(token);
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       _showLocalNotification(message);
