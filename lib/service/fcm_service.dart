@@ -39,14 +39,13 @@ class FirebaseNotificationService extends NotificationService {
   }
 
   Future<void> _requestPermissions() async {
-    if (Platform.isIOS) {
-      await _firebaseMessaging.requestPermission(
+    await FirebaseMessaging.instance.setAutoInitEnabled(true);
+    await _firebaseMessaging.requestPermission(
         alert: true,
         announcement: true,
         badge: true,
         sound: true,
-      );
-    }
+        provisional: Platform.isIOS);
   }
 
   Future<void> _configureLocalNotifications() async {
