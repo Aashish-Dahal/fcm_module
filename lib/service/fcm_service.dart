@@ -74,14 +74,15 @@ class FirebaseNotificationService extends NotificationService {
 
   void _showLocalNotification(RemoteMessage message) async {
     AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      channelId ?? 'high_importance_channel',
-      channelName ?? 'High Importance Notifications',
-      channelDescription: channelDescription,
+      channelId ?? message.data['channelId'],
+      channelName ?? message.data['channelName'],
+      channelDescription:
+          channelDescription ?? message.data['channelDescription'],
       importance: Importance.max,
       priority: Priority.high,
       color: notificationColor,
-      ticker: 'ticker',
     );
+
     NotificationDetails details = NotificationDetails(
       android: androidDetails,
       iOS: DarwinNotificationDetails(),
