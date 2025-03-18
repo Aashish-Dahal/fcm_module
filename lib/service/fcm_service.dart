@@ -139,9 +139,11 @@ class FirebaseNotificationService extends NotificationService {
 
     FirebaseMessaging.onMessage.listen(_showLocalNotification);
     FirebaseMessaging.onMessageOpenedApp.listen(onFCMNotificationTab);
-    _firebaseMessaging
-        .getInitialMessage()
-        .then((message) => onFCMNotificationTab ?? (message));
+    _firebaseMessaging.getInitialMessage().then((message) {
+      if (message != null) {
+        onFCMNotificationTab ?? (message);
+      }
+    });
   }
 
   /// Displays a local notification when an FCM message is received.
