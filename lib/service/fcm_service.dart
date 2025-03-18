@@ -137,10 +137,8 @@ class FirebaseNotificationService extends NotificationService {
       getToken ?? (token);
     }
 
-    FirebaseMessaging.onMessage
-        .listen((message) => _showLocalNotification(message));
-    FirebaseMessaging.onMessageOpenedApp
-        .listen((message) => onFCMNotificationTab ?? (message));
+    FirebaseMessaging.onMessage.listen(_showLocalNotification);
+    FirebaseMessaging.onMessageOpenedApp.listen(onFCMNotificationTab);
     _firebaseMessaging.getInitialMessage().then((message) {
       if (message != null) {
         onFCMNotificationTab ?? (message);
@@ -154,8 +152,8 @@ class FirebaseNotificationService extends NotificationService {
   /// from the [message] and displays it using the local notifications plugin.
   void _showLocalNotification(RemoteMessage message) async {
     AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      channelId ?? message.data['channelId'],
-      channelName ?? message.data['channelName'],
+      channelId ?? message.data['channelId'] ?? "channel_id",
+      channelName ?? message.data['channelName'] ?? "channel_name",
       channelDescription:
           channelDescription ?? message.data['channelDescription'],
       importance: Importance.max,
