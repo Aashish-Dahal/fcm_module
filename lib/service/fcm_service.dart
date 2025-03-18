@@ -137,8 +137,10 @@ class FirebaseNotificationService extends NotificationService {
       getToken ?? (token);
     }
 
-    FirebaseMessaging.onMessage.listen(_showLocalNotification);
-    FirebaseMessaging.onMessageOpenedApp.listen(onFCMNotificationTab);
+    FirebaseMessaging.onMessage
+        .listen((message) => _showLocalNotification(message));
+    FirebaseMessaging.onMessageOpenedApp
+        .listen((message) => onFCMNotificationTab ?? (message));
     _firebaseMessaging.getInitialMessage().then((message) {
       if (message != null) {
         onFCMNotificationTab ?? (message);
