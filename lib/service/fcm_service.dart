@@ -4,17 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart'
     show FirebaseMessaging, RemoteMessage;
 import 'package:flutter/material.dart' show Color;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
-    show
-        AndroidInitializationSettings,
-        AndroidNotificationDetails,
-        DarwinInitializationSettings,
-        DarwinNotificationDetails,
-        FlutterLocalNotificationsPlugin,
-        Importance,
-        InitializationSettings,
-        NotificationDetails,
-        NotificationResponse,
-        Priority;
+    show AndroidInitializationSettings, AndroidNotificationDetails, DarwinInitializationSettings, DarwinNotificationDetails, FlutterLocalNotificationsPlugin, Importance, InitializationSettings, NotificationDetails, NotificationResponse, Priority, AndroidNotificationChannel, AndroidFlutterLocalNotificationsPlugin;
 
 /// Abstract class for a notification service.
 ///
@@ -172,4 +162,23 @@ class FirebaseNotificationService extends NotificationService {
       details,
     );
   }
+/// Create Notification Channel [createNotificationChannel]
+Future<void> createNotificationChannel(
+    String id, String name, String description) async {
+  /// Define the Android Notification Channel details
+  final AndroidNotificationChannel androidChannel = AndroidNotificationChannel(
+    id, /// channel ID (e.g., 'high_importance_channel')
+    name, /// channel name (e.g., 'High Importance Notifications')
+    description: description, /// channel description
+    importance: Importance.max, /// Importance.max is equivalent to IMPORTANCE_HIGH
+    playSound: true,
+  );
+
+  // Register the channel with the Android system
+  await _flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(androidChannel);
 }
+}
+
