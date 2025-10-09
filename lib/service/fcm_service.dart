@@ -2,6 +2,7 @@ import 'dart:io' show Platform;
 
 import 'package:firebase_messaging/firebase_messaging.dart'
     show FirebaseMessaging, RemoteMessage;
+import 'package:firebase_push_notification_module/fcm_service.dart';
 import 'package:flutter/material.dart' show Color;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     show AndroidInitializationSettings, AndroidNotificationDetails, DarwinInitializationSettings, DarwinNotificationDetails, FlutterLocalNotificationsPlugin, Importance, InitializationSettings, NotificationDetails, NotificationResponse, Priority, AndroidNotificationChannel, AndroidFlutterLocalNotificationsPlugin;
@@ -128,7 +129,16 @@ class FirebaseNotificationService extends NotificationService {
     }
 
     FirebaseMessaging.onMessage.listen(_showLocalNotification);
-    FirebaseMessaging.onMessageOpenedApp.listen(onFCMNotificationTab);
+    FirebaseMessaging.onMessageOpenedApp.listen((message){
+    final String? channelId = message.data['channelId'] as String?;
+    final String? channelName = message.data['channelName'] as String?;
+    final String? description = message.data['channelDescription'] as String?;
+
+    if (channelId != null && channelName != null && description!=null) {
+     createNotificationChannel(channelId, channelName, description);
+    }
+    onFCMNotificationTab ?? (message);
+    });
     _firebaseMessaging.getInitialMessage().then((message) {
       if (message != null) {
         onFCMNotificationTab ?? (message);
@@ -151,6 +161,8 @@ class FirebaseNotificationService extends NotificationService {
       color: notificationColor,
     );
 
+    
+
     NotificationDetails details = NotificationDetails(
       android: androidDetails,
       iOS: DarwinNotificationDetails(),
@@ -172,6 +184,7 @@ Future<void> createNotificationChannel(
     description: description, /// channel description
     importance: Importance.max, /// Importance.max is equivalent to IMPORTANCE_HIGH
     playSound: true,
+    
   );
 
   // Register the channel with the Android system
