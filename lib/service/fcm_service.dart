@@ -140,7 +140,15 @@ class FirebaseNotificationService extends NotificationService {
     onFCMNotificationTab ?? (message);
     });
     _firebaseMessaging.getInitialMessage().then((message) {
+      
       if (message != null) {
+    final String? channelId = message.data['channelId'] as String?;
+    final String? channelName = message.data['channelName'] as String?;
+    final String? description = message.data['channelDescription'] as String?;
+
+    if (channelId != null && channelName != null && description!=null) {
+     createNotificationChannel(channelId, channelName, description);
+    }
         onFCMNotificationTab ?? (message);
       }
     });
@@ -174,6 +182,7 @@ class FirebaseNotificationService extends NotificationService {
       details,
     );
   }
+
 /// Create Notification Channel [createNotificationChannel]
 Future<void> createNotificationChannel(
     String id, String name, String description) async {
