@@ -1,17 +1,13 @@
 import 'dart:io' show Platform;
 
-import 'package:firebase_messaging/firebase_messaging.dart'
-    show FirebaseMessaging, RemoteMessage;
 import 'package:firebase_push_notification_module/fcm_service.dart';
 import 'package:flutter/material.dart' show Color;
-import 'package:flutter_local_notifications/flutter_local_notifications.dart'
-    show AndroidInitializationSettings, AndroidNotificationDetails, DarwinInitializationSettings, DarwinNotificationDetails, FlutterLocalNotificationsPlugin, Importance, InitializationSettings, NotificationDetails, NotificationResponse, Priority, AndroidNotificationChannel, AndroidFlutterLocalNotificationsPlugin;
 
 /// Abstract class for a notification service.
 ///
 /// Implementations of this class should provide an [initialize] method
 /// to set up notification handling.
-abstract class NotificationService {
+abstract class BaseNotificationService {
   /// Initializes the notification service.
   Future<void> initialize();
 }
@@ -23,7 +19,7 @@ abstract class NotificationService {
 /// is in the foreground and handling notification interactions.
 ///
 /// To initialize, call [initialize].
-class FirebaseNotificationService extends NotificationService {
+class FirebaseNotificationService extends BaseNotificationService {
   /// The Firebase Messaging instance used for push notifications.
   final FirebaseMessaging _firebaseMessaging;
 
