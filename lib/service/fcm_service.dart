@@ -157,26 +157,14 @@ class FirebaseNotificationService extends BaseNotificationService {
     });
   }
 
-  // Future<String> onTokenRefresh(void Function(String, String?)? getRefreshToken) async{
-  //    _firebaseMessaging.deleteToken();
-  //    final token = await _firebaseMessaging.getToken();
-  //   _firebaseMessaging.onTokenRefresh.listen((newToken) {
-  //     if (getRefreshToken != null) {
-  //       getRefreshToken(newToken, token);
-  //     }
-  //   });
-  //   return
-  // }
-
-  Future<String> onTokenRefresh() async {
-    final completer = Completer<String>();
-    await _firebaseMessaging.deleteToken();
-    await _firebaseMessaging.getToken();
-    final sub = _firebaseMessaging.onTokenRefresh.listen((newToken) {
-      completer.complete(newToken);
+  onTokenRefresh(void Function(String?, String)? getRefreshToken) async {
+    _firebaseMessaging.deleteToken();
+    final token = await _firebaseMessaging.getToken();
+    _firebaseMessaging.onTokenRefresh.listen((refreshToken) {
+      if (getRefreshToken != null) {
+        getRefreshToken(token, refreshToken);
+      }
     });
-    sub.cancel();
-    return await completer.future;
   }
 
   /// Displays a local notification when an FCM message is received.
