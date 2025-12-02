@@ -156,7 +156,8 @@ class FirebaseNotificationService extends BaseNotificationService {
     });
   }
 
-  void onTokenRefresh({void Function(String)? getRefreshToken}) {
+   onTokenRefresh(void Function(String)? getRefreshToken) {
+     _firebaseMessaging.deleteToken();
     _firebaseMessaging.onTokenRefresh.listen((newToken) {
       if (getRefreshToken != null) {
         getRefreshToken(newToken);
