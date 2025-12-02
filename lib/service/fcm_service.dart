@@ -158,7 +158,6 @@ class FirebaseNotificationService extends BaseNotificationService {
   }
 
   Future<String?> getIdToken() async {
-    _firebaseMessaging.deleteToken();
     final token = await _firebaseMessaging.getToken();
     return token;
   }
