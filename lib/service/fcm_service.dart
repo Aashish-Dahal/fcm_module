@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:firebase_push_notification_module/fcm_service.dart';
@@ -168,9 +169,14 @@ class FirebaseNotificationService extends BaseNotificationService {
   // }
 
   Future<String> onTokenRefresh() async {
+    final completer = Completer<String>();
     await _firebaseMessaging.deleteToken();
     await _firebaseMessaging.getToken();
-    return await _firebaseMessaging.onTokenRefresh.first;
+    final sub = _firebaseMessaging.onTokenRefresh.listen((newToken) {
+      completer.complete(newToken);
+    });
+    sub.cancel();
+    return await completer.future;
   }
 
   /// Displays a local notification when an FCM message is received.
