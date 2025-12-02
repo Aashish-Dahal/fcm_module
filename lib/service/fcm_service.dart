@@ -121,30 +121,32 @@ class FirebaseNotificationService extends BaseNotificationService {
   Future<void> _setupFirebaseListeners() async {
     if (showToken) {
       final token = await _firebaseMessaging.getToken();
-      getToken ?? (token);
+      if (getToken != null) {
+        getToken!(token);
+      }
     }
 
     FirebaseMessaging.onMessage.listen(_showLocalNotification);
-    FirebaseMessaging.onMessageOpenedApp.listen((message){
-    final String? channelId = message.data['channelId'] as String?;
-    final String? channelName = message.data['channelName'] as String?;
-    final String? description = message.data['channelDescription'] as String?;
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      final String? channelId = message.data['channelId'] as String?;
+      final String? channelName = message.data['channelName'] as String?;
+      final String? description = message.data['channelDescription'] as String?;
 
-    if (channelId != null && channelName != null && description!=null) {
-     createNotificationChannel(channelId, channelName, description);
-    }
-    onFCMNotificationTab ?? (message);
+      if (channelId != null && channelName != null && description != null) {
+        createNotificationChannel(channelId, channelName, description);
+      }
+      onFCMNotificationTab ?? (message);
     });
     _firebaseMessaging.getInitialMessage().then((message) {
-      
       if (message != null) {
-    final String? channelId = message.data['channelId'] as String?;
-    final String? channelName = message.data['channelName'] as String?;
-    final String? description = message.data['channelDescription'] as String?;
+        final String? channelId = message.data['channelId'] as String?;
+        final String? channelName = message.data['channelName'] as String?;
+        final String? description =
+            message.data['channelDescription'] as String?;
 
-    if (channelId != null && channelName != null && description!=null) {
-     createNotificationChannel(channelId, channelName, description);
-    }
+        if (channelId != null && channelName != null && description != null) {
+          createNotificationChannel(channelId, channelName, description);
+        }
         onFCMNotificationTab ?? (message);
       }
     });
@@ -165,8 +167,6 @@ class FirebaseNotificationService extends BaseNotificationService {
       color: notificationColor,
     );
 
-    
-
     NotificationDetails details = NotificationDetails(
       android: androidDetails,
       iOS: DarwinNotificationDetails(),
@@ -179,24 +179,31 @@ class FirebaseNotificationService extends BaseNotificationService {
     );
   }
 
-/// Create Notification Channel [createNotificationChannel]
-Future<void> createNotificationChannel(
-    String id, String name, String description) async {
-  /// Define the Android Notification Channel details
-  final AndroidNotificationChannel androidChannel = AndroidNotificationChannel(
-    id, /// channel ID (e.g., 'high_importance_channel')
-    name, /// channel name (e.g., 'High Importance Notifications')
-    description: description, /// channel description
-    importance: Importance.max, /// Importance.max is equivalent to IMPORTANCE_HIGH
-    playSound: true,
-    
-  );
+  /// Create Notification Channel [createNotificationChannel]
+  Future<void> createNotificationChannel(
+      String id, String name, String description) async {
+    /// Define the Android Notification Channel details
+    final AndroidNotificationChannel androidChannel =
+        AndroidNotificationChannel(
+      id,
 
-  // Register the channel with the Android system
-  await _flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(androidChannel);
-}
-}
+      /// channel ID (e.g., 'high_importance_channel')
+      name,
 
+      /// channel name (e.g., 'High Importance Notifications')
+      description: description,
+
+      /// channel description
+      importance: Importance.max,
+
+      /// Importance.max is equivalent to IMPORTANCE_HIGH
+      playSound: true,
+    );
+
+    // Register the channel with the Android system
+    await _flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(androidChannel);
+  }
+}
