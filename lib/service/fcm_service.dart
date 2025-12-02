@@ -164,7 +164,9 @@ class FirebaseNotificationService extends BaseNotificationService {
   }
 
   void onTokenRefresh(void Function(String) getRefreshToken) async {
-    _firebaseMessaging.onTokenRefresh.listen((refreshToken) {
+    StreamSubscription<String>? tokenRefreshSub;
+    tokenRefreshSub ??=
+        _firebaseMessaging.onTokenRefresh.listen((refreshToken) {
       getRefreshToken(refreshToken);
     });
   }
