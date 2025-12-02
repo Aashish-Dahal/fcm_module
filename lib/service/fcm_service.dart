@@ -135,7 +135,9 @@ class FirebaseNotificationService extends BaseNotificationService {
       if (channelId != null && channelName != null && description != null) {
         createNotificationChannel(channelId, channelName, description);
       }
-      onFCMNotificationTab ?? (message);
+      if (onFCMNotificationTab != null) {
+        onFCMNotificationTab!(message);
+      }
     });
     _firebaseMessaging.getInitialMessage().then((message) {
       if (message != null) {
@@ -147,13 +149,19 @@ class FirebaseNotificationService extends BaseNotificationService {
         if (channelId != null && channelName != null && description != null) {
           createNotificationChannel(channelId, channelName, description);
         }
-        onFCMNotificationTab ?? (message);
+        if (onFCMNotificationTab != null) {
+          onFCMNotificationTab!(message);
+        }
       }
     });
   }
 
-  Future<String> getRefreshToken() async {
-    return await _firebaseMessaging.onTokenRefresh.first;
+  void onTokenRefresh({void Function(String)? getRefreshToken}) {
+    _firebaseMessaging.onTokenRefresh.listen((newToken) {
+      if (getRefreshToken != null) {
+        getRefreshToken(newToken);
+      }
+    });
   }
 
   /// Displays a local notification when an FCM message is received.
