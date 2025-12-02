@@ -163,12 +163,11 @@ class FirebaseNotificationService extends BaseNotificationService {
     return token;
   }
 
-  void onTokenRefresh(void Function(String) getRefreshToken) async {
-    StreamSubscription<String>? tokenRefreshSub;
-    tokenRefreshSub ??=
-        _firebaseMessaging.onTokenRefresh.listen((refreshToken) {
-      getRefreshToken(refreshToken);
-    });
+  StreamSubscription<String> onTokenRefresh(
+    void Function(String) getRefreshToken,
+  ) {
+    final sub = _firebaseMessaging.onTokenRefresh.listen(getRefreshToken);
+    return sub;
   }
 
   /// Displays a local notification when an FCM message is received.
