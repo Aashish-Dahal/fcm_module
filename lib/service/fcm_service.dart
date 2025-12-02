@@ -120,11 +120,10 @@ class FirebaseNotificationService extends BaseNotificationService {
   /// - Handles notification taps when the app is opened.
   Future<void> _setupFirebaseListeners() async {
     if (showToken) {
-      _firebaseMessaging.onTokenRefresh.listen((newToken) {
-        if (getToken != null) {
-          getToken!(newToken);
-        }
-      });
+      final token = await _firebaseMessaging.getToken();
+      if (getToken != null) {
+        getToken!(token);
+      }
     }
 
     FirebaseMessaging.onMessage.listen(_showLocalNotification);
@@ -151,6 +150,10 @@ class FirebaseNotificationService extends BaseNotificationService {
         onFCMNotificationTab ?? (message);
       }
     });
+  }
+
+  Future<String> getRefreshToken() async {
+    return await _firebaseMessaging.onTokenRefresh.first;
   }
 
   /// Displays a local notification when an FCM message is received.
