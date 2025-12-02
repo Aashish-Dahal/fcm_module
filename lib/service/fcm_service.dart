@@ -170,7 +170,7 @@ class FirebaseNotificationService extends BaseNotificationService {
   Future<String> onTokenRefresh() async {
     await _firebaseMessaging.deleteToken();
     await _firebaseMessaging.getToken();
-    return _firebaseMessaging.onTokenRefresh.first;
+    return await _firebaseMessaging.onTokenRefresh.first;
   }
 
   /// Displays a local notification when an FCM message is received.
