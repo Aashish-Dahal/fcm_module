@@ -157,12 +157,15 @@ class FirebaseNotificationService extends BaseNotificationService {
     });
   }
 
-  onTokenRefresh(void Function(String?, String) getRefreshToken) async {
+  Future<String?> getIdToken() async {
     _firebaseMessaging.deleteToken();
-    _firebaseMessaging.getToken().then((token) {
-      _firebaseMessaging.onTokenRefresh.listen((refreshToken) {
-        getRefreshToken(token, refreshToken);
-      });
+    final token = await _firebaseMessaging.getToken();
+    return token;
+  }
+
+  void onTokenRefresh(void Function(String) getRefreshToken) async {
+    _firebaseMessaging.onTokenRefresh.listen((refreshToken) {
+      getRefreshToken(refreshToken);
     });
   }
 
