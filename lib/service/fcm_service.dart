@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io' show Platform;
 
 import 'package:firebase_push_notification_module/fcm_service.dart';
@@ -129,6 +130,8 @@ class FirebaseNotificationService extends BaseNotificationService {
 
     FirebaseMessaging.onMessage.listen(_showLocalNotification);
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      log("FCM Module::::On Message Background Notification ${message.data} ${message.notification?.android?.channelId}");
+
       final String? channelId = message.notification?.android?.channelId;
       final String? channelName = message.notification?.android?.channelId;
       final String? description = message.data['channelDescription'] as String?;
@@ -142,6 +145,8 @@ class FirebaseNotificationService extends BaseNotificationService {
     });
     _firebaseMessaging.getInitialMessage().then((message) {
       if (message != null) {
+        log("FCM Module::::Initial Background Notification ${message.data} ${message.notification?.android?.channelId}");
+
         final String? channelId = message.notification?.android?.channelId;
         final String? channelName = message.notification?.android?.channelId;
         final String? description =
@@ -174,6 +179,7 @@ class FirebaseNotificationService extends BaseNotificationService {
   /// This method extracts the notification title, body, and other details
   /// from the [message] and displays it using the local notifications plugin.
   void _showLocalNotification(RemoteMessage message) async {
+    log("FCM Module::::Local Notification ${message.data} ${message.notification?.android?.channelId}");
     AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       channelId ?? message.notification?.android?.channelId ?? "channel_id",
       channelName ?? message.notification?.android?.channelId ?? "channel_name",
