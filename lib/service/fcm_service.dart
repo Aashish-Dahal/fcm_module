@@ -129,8 +129,8 @@ class FirebaseNotificationService extends BaseNotificationService {
 
     FirebaseMessaging.onMessage.listen(_showLocalNotification);
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      final String? channelId = message.data['channelId'] as String?;
-      final String? channelName = message.data['channelName'] as String?;
+      final String? channelId = message.notification?.android?.channelId;
+      final String? channelName = message.notification?.android?.channelId;
       final String? description = message.data['channelDescription'] as String?;
 
       if (channelId != null && channelName != null && description != null) {
@@ -142,8 +142,8 @@ class FirebaseNotificationService extends BaseNotificationService {
     });
     _firebaseMessaging.getInitialMessage().then((message) {
       if (message != null) {
-        final String? channelId = message.data['channelId'] as String?;
-        final String? channelName = message.data['channelName'] as String?;
+        final String? channelId = message.notification?.android?.channelId;
+        final String? channelName = message.notification?.android?.channelId;
         final String? description =
             message.data['channelDescription'] as String?;
 
@@ -175,8 +175,8 @@ class FirebaseNotificationService extends BaseNotificationService {
   /// from the [message] and displays it using the local notifications plugin.
   void _showLocalNotification(RemoteMessage message) async {
     AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      channelId ?? message.data['channelId'] ?? "channel_id",
-      channelName ?? message.data['channelName'] ?? "channel_name",
+      channelId ?? message.notification?.android?.channelId ?? "channel_id",
+      channelName ?? message.notification?.android?.channelId ?? "channel_name",
       channelDescription:
           channelDescription ?? message.data['channelDescription'],
       importance: Importance.max,
