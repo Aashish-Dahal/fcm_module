@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io' show Platform;
 
 import 'package:firebase_push_notification_module/fcm_service.dart';
 import 'package:flutter/material.dart' show Color;
@@ -95,7 +94,7 @@ class FirebaseNotificationService extends BaseNotificationService {
         announcement: true,
         badge: true,
         sound: true,
-        provisional: Platform.isIOS);
+        provisional: false);
   }
 
   /// Configures the local notification settings.
