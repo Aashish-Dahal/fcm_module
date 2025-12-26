@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:firebase_push_notification_module/fcm_service.dart';
@@ -110,8 +111,10 @@ class FirebaseNotificationService extends BaseNotificationService {
       android: androidSettings,
       iOS: iosSettings,
     );
-    _flutterLocalNotificationsPlugin.initialize(initSettings,
-        onDidReceiveNotificationResponse: onLocalNotificationTab);
+    _flutterLocalNotificationsPlugin.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: onLocalNotificationTab,
+    );
   }
 
   /// Sets up Firebase listeners for push notifications.
@@ -194,11 +197,8 @@ class FirebaseNotificationService extends BaseNotificationService {
       iOS: DarwinNotificationDetails(),
     );
     await _flutterLocalNotificationsPlugin.show(
-      0,
-      message.notification?.title,
-      message.notification?.body,
-      details,
-    );
+        0, message.notification?.title, message.notification?.body, details,
+        payload: jsonEncode(message.data));
   }
 
   /// Create Notification Channel [createNotificationChannel]
