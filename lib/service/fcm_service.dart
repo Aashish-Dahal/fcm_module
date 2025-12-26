@@ -198,7 +198,10 @@ class FirebaseNotificationService extends BaseNotificationService {
     );
     await _flutterLocalNotificationsPlugin.show(
         0, message.notification?.title, message.notification?.body, details,
-        payload: jsonEncode(message.data));
+        payload: jsonEncode({
+          ...message.data,
+          "channelId": message.notification?.android?.channelId ?? "channel_id"
+        }));
   }
 
   /// Create Notification Channel [createNotificationChannel]
