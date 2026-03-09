@@ -196,8 +196,10 @@ class FirebaseNotificationService extends BaseNotificationService {
       android: androidDetails,
       iOS: DarwinNotificationDetails(),
     );
+ final uniqueNotificationId = _generateUniqueNotificationId();
+
     await _flutterLocalNotificationsPlugin.show(
-        0, message.notification?.title, message.notification?.body, details,
+        uniqueNotificationId, message.notification?.title, message.notification?.body, details,
         payload: jsonEncode({
           ...message.data,
           "channelId": message.notification?.android?.channelId ?? "channel_id"
@@ -231,4 +233,10 @@ class FirebaseNotificationService extends BaseNotificationService {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(androidChannel);
   }
+
+  int _generateUniqueNotificationId() {
+  final timestamp = DateTime.now().millisecondsSinceEpoch;
+  final randomNum = Random().nextInt(1000);
+  return ((timestamp + randomNum) % 2147483647).toInt();
+}
 }
