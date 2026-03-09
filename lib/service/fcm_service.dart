@@ -133,7 +133,7 @@ class FirebaseNotificationService extends BaseNotificationService {
 
     FirebaseMessaging.onMessage.listen(_showLocalNotification);
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      log("FCM Module::::On Message Background Notification ${message.data} ${message.notification?.android?.channelId}");
+      debugPrint("FCM Module::::On Message Background Notification ${message.data} ${message.notification?.android?.channelId}");
 
       final String? channelId = message.notification?.android?.channelId;
       final String? channelName = message.notification?.android?.channelId;
