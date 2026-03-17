@@ -73,7 +73,9 @@ class FirebaseNotificationService extends BaseNotificationService {
       this.channelDescription,
       required this.defaultIcon,
       this.showToken = false,
-      this.getToken});
+      this.getToken,    
+      this.onTokenRefreshCallback,
+});
 
   /// Initializes the notification service.
   ///
