@@ -50,6 +50,9 @@ class FirebaseNotificationService extends BaseNotificationService {
   /// Callback function to retrieve the FCM token.
   final Function(String? vapidKey)? getToken;
 
+    /// Called whenever the token changes or is refreshed
+  final Function(String)? onTokenRefreshCallback;
+
   /// The default notification icon for Android.
   final String defaultIcon;
 
@@ -83,6 +86,8 @@ class FirebaseNotificationService extends BaseNotificationService {
     await _requestPermissions();
     await _configureLocalNotifications();
     await _setupFirebaseListeners();
+    await _initFCMTokenCallback();
+
   }
 
   /// Requests permissions for push notifications.
@@ -169,12 +174,18 @@ class FirebaseNotificationService extends BaseNotificationService {
     final token = await _firebaseMessaging.getToken();
     return token;
   }
+  /// Initialize token callback: get current token + listen for refresh
+  Future<void> _initFCMTokenCallback() async {
+    // 1️⃣ Get current token on app start
+    final token = await _firebaseMessaging.getToken();
+    if (token != null && onTokenRefreshCallback != null) {
+      onTokenRefreshCallback!(token);
+    }
 
-  StreamSubscription<String> onTokenRefresh(
-    void Function(String) getRefreshToken,
-  ) {
-    final sub = _firebaseMessaging.onTokenRefresh.listen(getRefreshToken);
-    return sub;
+    // 2️⃣ Listen for token refresh while app is running
+    _firebaseMessaging.onTokenRefresh.listen((newToken) {
+      if (onTokenRefreshCallback != null) onTokenRefreshCallback!(newToken);
+    });
   }
 
   /// Displays a local notification when an FCM message is received.
@@ -197,7 +208,8 @@ class FirebaseNotificationService extends BaseNotificationService {
       android: androidDetails,
       iOS: DarwinNotificationDetails(),
     );
- final uniqueNotificationId = _generateUniqueNotificationId();
+
+    final uniqueNotificationId = _generateUniqueNotificationId();
 
     await _flutterLocalNotificationsPlugin.show(
         uniqueNotificationId, message.notification?.title, message.notification?.body, details,
