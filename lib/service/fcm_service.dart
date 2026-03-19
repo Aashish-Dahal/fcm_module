@@ -85,10 +85,12 @@ class FirebaseNotificationService extends BaseNotificationService {
   /// - Sets up Firebase listeners for incoming notifications.
   @override
   Future<void> initialize() async {
-    await _requestPermissions();
-    await _configureLocalNotifications();
-    await _setupFirebaseListeners();
-    await _initFCMTokenCallback();
+      await _requestPermissions();
+    await Future.wait([
+      _configureLocalNotifications(),
+      _setupFirebaseListeners(),
+    ]);
+    _initFCMTokenCallback();
 
   }
 
@@ -97,7 +99,7 @@ class FirebaseNotificationService extends BaseNotificationService {
   /// This method enables auto-initialization of FCM and requests user permission
   /// to receive notifications. On iOS, it includes provisional authorization.
   Future<void> _requestPermissions() async {
-    await FirebaseMessaging.instance.setAutoInitEnabled(true);
+    FirebaseMessaging.instance.setAutoInitEnabled(true);
     await _firebaseMessaging.requestPermission(
         alert: true,
         announcement: true,
