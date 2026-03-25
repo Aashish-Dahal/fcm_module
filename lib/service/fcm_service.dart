@@ -4,7 +4,7 @@ import 'dart:math';
 
 
 import 'package:firebase_push_notification_module/fcm_service.dart';
-import 'package:flutter/material.dart' show Color, debugPrint;
+import 'package:flutter/material.dart' show Color, ValueNotifier, debugPrint;
 
 /// Abstract class for a notification service.
 ///
@@ -58,6 +58,53 @@ class FirebaseNotificationService extends BaseNotificationService {
 
   /// Whether to log or retrieve the FCM token.
   final bool showToken;
+
+  // ═══════════════════════════════════════════════════════════
+  //  BADGE SUPPORT
+  // ═══════════════════════════════════════════════════════════
+
+  /// Listen to this anywhere in your widget tree.
+  ///
+  /// Example:
+  /// ```dart
+  /// ValueListenableBuilder<int>(
+  ///   valueListenable: FirebaseNotificationService.badgeNotifier,
+  ///   builder: (context, count, _) => BadgeWidget(count: count),
+  /// )
+  /// ```
+  static final ValueNotifier<int> badgeNotifier = ValueNotifier(0);
+  static int _badgeCount = 0;
+
+  /// Increment badge by 1 — called automatically on new notification.
+  static void _incrementBadge() {
+    _badgeCount++;
+    badgeNotifier.value = _badgeCount;
+  }
+
+  /// Decrement badge by 1 — call this when a single notification is tapped.
+  static void decrementBadge() {
+    if (_badgeCount > 0) {
+      _badgeCount--;
+      badgeNotifier.value = _badgeCount;
+    }
+  }
+
+  /// Reset badge to 0 — call this when user opens the notifications screen.
+  static void clearBadge() {
+    _badgeCount = 0;
+    badgeNotifier.value = 0;
+  }
+
+  /// Set badge to an exact value — use this to sync with server unread count.
+  static void setBadge(int count) {
+    _badgeCount = count < 0 ? 0 : count;
+    badgeNotifier.value = _badgeCount;
+  }
+
+  /// Dispose the notifier — call this only from root MyApp widget dispose().
+  static void disposeBadgeNotifier() {
+    badgeNotifier.dispose();
+  }
 
   /// Creates an instance of [FirebaseNotificationService].
   ///
@@ -123,8 +170,15 @@ class FirebaseNotificationService extends BaseNotificationService {
     );
     _flutterLocalNotificationsPlugin.initialize(
       initSettings,
-      onDidReceiveNotificationResponse: onLocalNotificationTab,
-    );
+ onDidReceiveNotificationResponse: (NotificationResponse response) {
+   /// ✅ Foreground local notification tapped
+  /// was incremented in _showLocalNotification → now decrement
+    decrementBadge(); 
+    if (onLocalNotificationTab != null) {
+      onLocalNotificationTab!(response);
+    }
+  },   
+   );
   }
 
   /// Sets up Firebase listeners for push notifications.
@@ -142,6 +196,7 @@ class FirebaseNotificationService extends BaseNotificationService {
 
     FirebaseMessaging.onMessage.listen(_showLocalNotification);
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      _incrementBadge();
       debugPrint("FCM Module::::On Message Background Notification ${message.data} ${message.notification?.android?.channelId}");
 
       final String? channelId = message.notification?.android?.channelId;
@@ -152,11 +207,13 @@ class FirebaseNotificationService extends BaseNotificationService {
         createNotificationChannel(channelId, channelName, description);
       }
       if (onFCMNotificationTab != null) {
+        decrementBadge();
         onFCMNotificationTab!(message);
       }
     });
     _firebaseMessaging.getInitialMessage().then((message) {
       if (message != null) {
+        _incrementBadge();
         debugPrint("FCM Module::::Initial Background Notification ${message.data} ${message.notification?.android?.channelId}");
 
         final String? channelId = message.notification?.android?.channelId;
@@ -168,6 +225,7 @@ class FirebaseNotificationService extends BaseNotificationService {
           createNotificationChannel(channelId, channelName, description);
         }
         if (onFCMNotificationTab != null) {
+          decrementBadge();
           onFCMNotificationTab!(message);
         }
       }
@@ -197,6 +255,7 @@ class FirebaseNotificationService extends BaseNotificationService {
   /// This method extracts the notification title, body, and other details
   /// from the [message] and displays it using the local notifications plugin.
   void _showLocalNotification(RemoteMessage message) async {
+    _incrementBadge();   
     debugPrint("FCM Module::::Local Notification ${message.data} ${message.notification?.android?.channelId}");
     AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       channelId ?? message.notification?.android?.channelId ?? "channel_id",
