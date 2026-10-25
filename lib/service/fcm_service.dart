@@ -59,6 +59,11 @@ class FirebaseNotificationService extends BaseNotificationService {
   /// Whether to log or retrieve the FCM token.
   final bool showToken;
 
+  /// Whether a push's picture (FCM's `notification.image`) is shown in the
+  /// notification drawn while the app is open: beside the text and full size
+  /// when expanded on Android, as an attachment on iOS. On by default.
+  final bool showImages;
+
   // ═══════════════════════════════════════════════════════════
   //  BADGE SUPPORT
   // ═══════════════════════════════════════════════════════════
@@ -120,6 +125,7 @@ class FirebaseNotificationService extends BaseNotificationService {
       this.channelDescription,
       required this.defaultIcon,
       this.showToken = false,
+      this.showImages = true,
       this.getToken,    
       this.onTokenRefreshCallback,
 });
@@ -267,15 +273,25 @@ class FirebaseNotificationService extends BaseNotificationService {
       color: notificationColor,
     );
 
+    // The push's picture, if it has one (the system shows it by itself only
+    // for pushes that arrive while the app is in the background).
+    final image = showImages ? await NotificationImage.of(message) : null;
+    final title = message.notification?.title;
+    final body = message.notification?.body;
+
     NotificationDetails details = NotificationDetails(
-      android: androidDetails,
-      iOS: DarwinNotificationDetails(),
+      android: image == null
+          ? androidDetails
+          : image.android(androidDetails, title: title, body: body),
+      iOS: image == null
+          ? const DarwinNotificationDetails()
+          : await image.darwin(),
     );
 
     final uniqueNotificationId = _generateUniqueNotificationId();
 
     await _flutterLocalNotificationsPlugin.show(
-        uniqueNotificationId, message.notification?.title, message.notification?.body, details,
+        uniqueNotificationId, title, body, details,
         payload: jsonEncode({
           ...message.data,
           "channelId": message.notification?.android?.channelId ?? "channel_id"
